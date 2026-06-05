@@ -1,0 +1,596 @@
+HTMLEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack — Finance App</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--bg:#000;--bg2:#06060f;--bg3:#0b0b1a;--border:#1a1a35;--blue:#1a6fff;--blue2:#4d8fff;--text:#fff;--text2:#8899cc;--text3:#334466;--green:#00cc88;--red:#ff4466;--orange:#ff8c00;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:40px 20px;}
+
+/* PAGE WRAPPER */
+.page-wrapper{display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;justify-content:center;width:100%;max-width:1200px;}
+
+/* PHONE FRAME */
+.phone-frame{width:375px;min-height:812px;background:var(--bg);border-radius:48px;border:2px solid #222;box-shadow:0 40px 120px rgba(0,0,0,0.8),0 0 0 6px #111,inset 0 0 0 1px #333;overflow:hidden;position:relative;flex-shrink:0;}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:34px;background:#111;border-radius:0 0 20px 20px;z-index:20;display:flex;align-items:center;justify-content:center;gap:8px;}
+.notch-cam{width:10px;height:10px;background:#222;border-radius:50%;}
+.notch-cam.lens{background:#1a1a1a;border:2px solid #333;width:12px;height:12px;}
+.phone-screen{height:812px;overflow:hidden;position:relative;}
+
+/* SCREENS */
+.screen{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;background:var(--bg);}
+.screen::-webkit-scrollbar{display:none;}
+.screen.hidden{display:none;}
+
+/* STATUS BAR */
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:48px 24px 12px;font-size:12px;font-weight:600;}
+.status-time{font-family:'Syne',sans-serif;}
+.status-icons{display:flex;align-items:center;gap:5px;font-size:11px;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(6,6,15,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:12px 0 28px;display:flex;align-items:center;justify-content:space-around;z-index:10;}
+.nav-tab{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 16px;border-radius:12px;transition:all 0.2s;position:relative;}
+.nav-tab.active .nav-icon{color:var(--blue2);}
+.nav-tab.active .nav-label{color:var(--blue2);}
+.nav-icon{font-size:20px;color:var(--text3);transition:color 0.2s;}
+.nav-label{font-size:10px;color:var(--text3);font-weight:500;transition:color 0.2s;}
+.nav-tab.active::before{content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:36px;height:2px;background:var(--blue);border-radius:0 0 4px 4px;}
+.fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 8px 24px rgba(26,111,255,0.4);transition:all 0.2s;border:none;color:#fff;}
+.fab:hover,.fab:active{transform:scale(0.95);}
+
+/* HOME SCREEN */
+.home-header{padding:12px 24px 20px;display:flex;align-items:center;justify-content:space-between;}
+.greeting-text{font-size:13px;color:var(--text2);}
+.user-name{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-top:2px;}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer;}
+
+/* BALANCE CARD */
+.balance-card{margin:0 20px;padding:28px;background:linear-gradient(135deg,rgba(26,111,255,0.15),rgba(26,111,255,0.05));border:1px solid rgba(26,111,255,0.2);border-radius:24px;position:relative;overflow:hidden;}
+.balance-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(26,111,255,0.15),transparent 70%);}
+.balance-label{font-size:12px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.balance-amount{font-family:'Syne',sans-serif;font-weight:800;font-size:40px;letter-spacing:-1px;margin-bottom:4px;}
+.balance-change{font-size:13px;color:var(--green);display:flex;align-items:center;gap:4px;}
+.balance-row{display:flex;justify-content:space-between;margin-top:24px;}
+.balance-stat{text-align:center;}
+.balance-stat-num{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;}
+.balance-stat-label{font-size:11px;color:var(--text2);margin-top:2px;}
+.divider-v{width:1px;background:rgba(255,255,255,0.1);margin:4px 0;}
+
+/* QUICK ACTIONS */
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+.see-all{font-size:12px;color:var(--blue2);cursor:pointer;}
+.quick-actions{display:flex;gap:12px;padding:0 20px 20px;overflow-x:auto;scrollbar-width:none;}
+.quick-actions::-webkit-scrollbar{display:none;}
+.action-btn{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;min-width:64px;}
+.action-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform 0.2s;}
+.action-btn:active .action-icon{transform:scale(0.9);}
+.action-label{font-size:11px;color:var(--text2);font-weight:500;text-align:center;}
+
+/* SPENDING SUMMARY */
+.spend-card{margin:0 20px 20px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;}
+.chart-container{height:160px;margin:12px 0;}
+.legend-items{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* TRANSACTIONS */
+.transactions-list{padding:0 20px 100px;}
+.tx-date-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;margin-top:4px;}
+.tx-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;transition:all 0.2s;cursor:pointer;}
+.tx-item:active{transform:scale(0.98);}
+.tx-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.tx-info{flex:1;}
+.tx-name{font-weight:600;font-size:14px;}
+.tx-cat{font-size:11px;color:var(--text3);margin-top:2px;}
+.tx-amount{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+.tx-amount.credit{color:var(--green);}
+.tx-amount.debit{color:var(--red);}
+
+/* CARDS SCREEN */
+.cards-carousel{display:flex;gap:16px;padding:0 20px 20px;overflow-x:auto;scrollbar-width:none;}
+.cards-carousel::-webkit-scrollbar{display:none;}
+.debit-card{width:300px;min-width:300px;padding:24px;border-radius:20px;position:relative;overflow:hidden;cursor:pointer;transition:transform 0.2s;}
+.debit-card:active{transform:scale(0.97);}
+.card-bg1{background:linear-gradient(135deg,#1a3a8f,#1a6fff);}
+.card-bg2{background:linear-gradient(135deg,#1a1a35,#334466);}
+.card-bg3{background:linear-gradient(135deg,#0a2a1a,#00cc88);}
+.card-network{position:absolute;top:20px;right:20px;font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;}
+.card-chip{width:32px;height:24px;background:rgba(255,215,0,0.6);border-radius:6px;margin-bottom:24px;}
+.card-number{font-size:16px;letter-spacing:3px;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:20px;}
+.card-bottom{display:flex;justify-content:space-between;align-items:flex-end;}
+.card-holder{font-size:13px;font-weight:600;}
+.card-expiry-label{font-size:9px;text-transform:uppercase;opacity:0.6;margin-bottom:2px;}
+.card-expiry{font-size:13px;font-weight:600;}
+.card-balance-section{padding:24px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;margin:0 20px 20px;}
+
+/* BUDGETS SCREEN */
+.budget-overview{margin:0 20px 20px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;text-align:center;}
+.budget-circle{position:relative;width:140px;height:140px;margin:0 auto 16px;}
+.budget-label-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.budget-amount{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;line-height:1;}
+.budget-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.budget-items{padding:0 20px 100px;}
+.budget-item{padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin-bottom:10px;}
+.budget-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.budget-item-left{display:flex;align-items:center;gap:10px;}
+.budget-item-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.budget-item-name{font-weight:600;font-size:14px;}
+.budget-item-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.budget-amounts{text-align:right;}
+.budget-spent{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+.budget-total{font-size:11px;color:var(--text3);}
+.progress-bar{height:6px;background:var(--bg3);border-radius:100px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:100px;transition:width 1s ease;}
+
+/* PROFILE SCREEN */
+.profile-header{padding:20px 24px 28px;text-align:center;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;}
+.profile-name{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;}
+.profile-email{font-size:13px;color:var(--text2);margin-top:4px;}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:20px;margin:0 20px 24px;overflow:hidden;}
+.profile-stat{padding:16px;text-align:center;border-right:1px solid var(--border);}
+.profile-stat:last-child{border-right:none;}
+.profile-stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
+.profile-stat-label{font-size:11px;color:var(--text3);margin-top:3px;}
+.settings-list{padding:0 20px 100px;}
+.settings-group{background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden;}
+.settings-item{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.2s;}
+.settings-item:last-child{border-bottom:none;}
+.settings-item:hover{background:rgba(26,111,255,0.05);}
+.settings-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.settings-label{flex:1;font-size:14px;font-weight:500;}
+.settings-arrow{color:var(--text3);font-size:14px;}
+.settings-value{font-size:13px;color:var(--text2);margin-right:6px;}
+.toggle-pill{width:40px;height:22px;background:var(--blue);border-radius:100px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s;}
+.toggle-pill.off{background:var(--border);}
+.toggle-knob{width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform 0.2s;}
+.toggle-pill:not(.off) .toggle-knob{transform:translateX(18px);}
+
+/* ADD TRANSACTION MODAL */
+.modal-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:20px 24px 100px;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);z-index:50;}
+.modal-sheet.open{transform:translateY(0);}
+.sheet-handle{width:40px;height:4px;background:var(--border);border-radius:100px;margin:0 auto 20px;}
+.sheet-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:20px;text-align:center;}
+.type-tabs{display:flex;gap:8px;margin-bottom:20px;background:var(--bg3);border-radius:12px;padding:4px;}
+.type-tab{flex:1;padding:10px;border-radius:8px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--text2);}
+.type-tab.active.expense{background:rgba(255,68,102,0.15);color:var(--red);}
+.type-tab.active.income{background:rgba(0,204,136,0.15);color:var(--green);}
+.amount-display{text-align:center;font-family:'Syne',sans-serif;font-weight:800;font-size:48px;margin-bottom:20px;letter-spacing:-2px;cursor:default;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.form-input{width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:rgba(26,111,255,0.4);}
+.form-select{appearance:none;}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.num-btn{padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:18px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'DM Sans',sans-serif;}
+.num-btn:active{background:rgba(26,111,255,0.1);border-color:var(--blue);}
+.num-btn.del{color:var(--red);}
+.submit-btn{width:100%;padding:15px;background:var(--blue);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.submit-btn:hover{background:var(--blue2);}
+.sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:45;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.sheet-overlay.open{opacity:1;pointer-events:all;}
+
+/* TOAST */
+.mobile-toast{position:absolute;top:80px;left:24px;right:24px;background:var(--bg2);border:1px solid rgba(26,111,255,0.3);border-radius:14px;padding:14px 16px;font-size:13px;z-index:60;transform:translateY(-20px);opacity:0;transition:all 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.mobile-toast.show{transform:translateY(0);opacity:1;}
+
+/* RIGHT PANEL */
+.info-panel{flex:1;min-width:280px;max-width:400px;}
+.info-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;}
+.info-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:8px;}
+.info-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;}
+.feature-list{display:flex;flex-direction:column;gap:8px;}
+.feature-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);}
+.feature-row::before{content:'✓';color:var(--blue2);font-weight:700;flex-shrink:0;}
+.screen-btns{display:flex;flex-direction:column;gap:8px;}
+.screen-btn{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.2s;font-size:13px;color:var(--text2);}
+.screen-btn:hover,.screen-btn.active{border-color:var(--blue);color:#fff;background:rgba(26,111,255,0.08);}
+.screen-btn-icon{font-size:18px;width:28px;text-align:center;}
+
+@media(max-width:600px){
+  .phone-frame{width:100%;border-radius:0;border:none;min-height:100vh;}
+  .phone-screen{height:100vh;}
+  .info-panel{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div style="text-align:center;margin-bottom:32px;">
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:28px;margin-bottom:8px">FinTrack <span style="color:var(--blue2)">Mobile App</span></div>
+  <div style="font-size:14px;color:var(--text2)">Flutter UI Demo — Click the bottom tabs to navigate screens</div>
+</div>
+
+<div class="page-wrapper">
+
+  <!-- PHONE -->
+  <div class="phone-frame">
+    <div class="phone-notch"><div class="notch-cam"></div><div class="notch-cam lens"></div></div>
+    <div class="phone-screen">
+
+      <!-- HOME SCREEN -->
+      <div class="screen" id="screen-home">
+        <div class="status-bar"><span class="status-time" id="statusTime">9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+        <div class="home-header">
+          <div><div class="greeting-text" id="greeting">Good morning 👋</div><div class="user-name">Tunmise</div></div>
+          <div class="avatar" onclick="switchScreen('profile')">TD</div>
+        </div>
+        <div class="balance-card">
+          <div class="balance-label">Total Balance</div>
+          <div class="balance-amount" id="balanceAmount">$0.00</div>
+          <div class="balance-change">↑ +$1,240 this month</div>
+          <div class="balance-row">
+            <div class="balance-stat"><div class="balance-stat-num" style="color:var(--green)">$4,820</div><div class="balance-stat-label">💚 Income</div></div>
+            <div class="divider-v"></div>
+            <div class="balance-stat"><div class="balance-stat-num" style="color:var(--red)">$2,350</div><div class="balance-stat-label">❤️ Expenses</div></div>
+            <div class="divider-v"></div>
+            <div class="balance-stat"><div class="balance-stat-num" style="color:var(--blue2)">$1,240</div><div class="balance-stat-label">💙 Savings</div></div>
+          </div>
+        </div>
+
+        <div class="section-header"><span class="section-title">Quick Actions</span></div>
+        <div class="quick-actions">
+          <div class="action-btn" onclick="openSheet('expense')"><div class="action-icon" style="background:rgba(255,68,102,0.1)">➕</div><div class="action-label">Add Expense</div></div>
+          <div class="action-btn" onclick="openSheet('income')"><div class="action-icon" style="background:rgba(0,204,136,0.1)">💰</div><div class="action-label">Add Income</div></div>
+          <div class="action-btn" onclick="switchScreen('budgets')"><div class="action-icon" style="background:rgba(26,111,255,0.1)">📊</div><div class="action-label">Budgets</div></div>
+          <div class="action-btn" onclick="switchScreen('cards')"><div class="action-icon" style="background:rgba(255,140,0,0.1)">💳</div><div class="action-label">My Cards</div></div>
+          <div class="action-btn" onclick="showMobileToast('📤 Transfer coming soon!')"><div class="action-icon" style="background:rgba(153,68,255,0.1)">↗️</div><div class="action-label">Transfer</div></div>
+        </div>
+
+        <div class="section-header"><span class="section-title">Spending</span><span class="see-all" onclick="switchScreen('budgets')">See all</span></div>
+        <div class="spend-card">
+          <div class="chart-container"><canvas id="spendingChart"></canvas></div>
+          <div class="legend-items" id="spendLegend"></div>
+        </div>
+
+        <div class="section-header"><span class="section-title">Transactions</span><span class="see-all" onclick="switchScreen('transactions')">See all</span></div>
+        <div class="transactions-list" id="recentTx"></div>
+      </div>
+
+      <!-- TRANSACTIONS SCREEN -->
+      <div class="screen hidden" id="screen-transactions">
+        <div class="status-bar"><span class="status-time" id="statusTime2">9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+        <div class="home-header"><div><div class="greeting-text">Your</div><div class="user-name">Transactions</div></div><div class="action-icon" style="background:rgba(26,111,255,0.1);width:40px;height:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;border-radius:12px" onclick="showMobileToast('🔍 Search transactions')">🔍</div></div>
+        <div style="padding:0 20px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none">
+          <button class="num-btn" style="white-space:nowrap;padding:8px 16px;font-size:13px;border-radius:100px" onclick="filterTx('all',this)">All</button>
+          <button class="num-btn" style="white-space:nowrap;padding:8px 16px;font-size:13px;border-radius:100px" onclick="filterTx('income',this)">Income</button>
+          <button class="num-btn" style="white-space:nowrap;padding:8px 16px;font-size:13px;border-radius:100px" onclick="filterTx('expense',this)">Expenses</button>
+        </div>
+        <div class="transactions-list" id="allTx" style="padding-bottom:100px"></div>
+      </div>
+
+      <!-- CARDS SCREEN -->
+      <div class="screen hidden" id="screen-cards">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+        <div class="home-header"><div><div class="greeting-text">My</div><div class="user-name">Cards</div></div></div>
+        <div class="cards-carousel">
+          <div class="debit-card card-bg1" onclick="showMobileToast('💳 Visa •• 4291')"><div class="card-network">VISA</div><div class="card-chip"></div><div class="card-number">•••• •••• •••• 4291</div><div class="card-bottom"><div><div class="card-holder">TUNMISE DAVID</div></div><div><div class="card-expiry-label">Expires</div><div class="card-expiry">09/27</div></div></div></div>
+          <div class="debit-card card-bg3" onclick="showMobileToast('💳 Mastercard •• 8847')"><div class="card-network">MC</div><div class="card-chip"></div><div class="card-number">•••• •••• •••• 8847</div><div class="card-bottom"><div><div class="card-holder">TUNMISE DAVID</div></div><div><div class="card-expiry-label">Expires</div><div class="card-expiry">03/26</div></div></div></div>
+          <div class="debit-card card-bg2" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:pointer" onclick="showMobileToast('➕ Add new card')"><div style="font-size:32px">+</div><div style="font-size:13px;color:var(--text2)">Add New Card</div></div>
+        </div>
+        <div class="card-balance-section">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px"><span style="font-family:'Syne',sans-serif;font-weight:700">Visa •• 4291</span><span style="color:var(--blue2);font-size:13px;cursor:pointer" onclick="showMobileToast('📊 Card details')">Details ›</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:var(--bg3);padding:14px;border-radius:14px;border:1px solid var(--border)"><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Available</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--green)">$3,240.00</div></div>
+            <div style="background:var(--bg3);padding:14px;border-radius:14px;border:1px solid var(--border)"><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Spent</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--red)">$1,580.00</div></div>
+            <div style="background:var(--bg3);padding:14px;border-radius:14px;border:1px solid var(--border)"><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Limit</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px">$5,000.00</div></div>
+            <div style="background:var(--bg3);padding:14px;border-radius:14px;border:1px solid var(--border)"><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Cashback</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--orange)">$24.50</div></div>
+          </div>
+          <div style="margin-top:16px;height:6px;background:var(--bg3);border-radius:100px;overflow:hidden"><div style="width:31.6%;height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:100px"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text3)"><span>$1,580 used</span><span>31.6% of $5,000</span></div>
+        </div>
+      </div>
+
+      <!-- BUDGETS SCREEN -->
+      <div class="screen hidden" id="screen-budgets">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+        <div class="home-header"><div><div class="greeting-text">Monthly</div><div class="user-name">Budgets</div></div></div>
+        <div class="budget-overview">
+          <div class="budget-circle"><canvas id="budgetCircle"></canvas><div class="budget-label-center"><div class="budget-amount">68%</div><div class="budget-sub">Used</div></div></div>
+          <div style="font-size:13px;color:var(--text2)">$2,350 spent of $3,500 budget</div>
+        </div>
+        <div class="budget-items" id="budgetList"></div>
+      </div>
+
+      <!-- PROFILE SCREEN -->
+      <div class="screen hidden" id="screen-profile">
+        <div class="status-bar"><span class="status-time">9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+        <div class="profile-header">
+          <div class="profile-avatar">TD</div>
+          <div class="profile-name">Tunmise David</div>
+          <div class="profile-email">tunmisedavid@email.com</div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><div class="profile-stat-num" style="color:var(--blue2)">147</div><div class="profile-stat-label">Transactions</div></div>
+          <div class="profile-stat"><div class="profile-stat-num" style="color:var(--green)">$24.5K</div><div class="profile-stat-label">Total Income</div></div>
+          <div class="profile-stat"><div class="profile-stat-num" style="color:var(--orange)">3</div><div class="profile-stat-label">Cards</div></div>
+        </div>
+        <div class="settings-list">
+          <div class="settings-group">
+            <div class="settings-item" onclick="showMobileToast('👤 Edit Profile')"><div class="settings-icon" style="background:rgba(26,111,255,0.1)">👤</div><span class="settings-label">Edit Profile</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="showMobileToast('🔔 Notifications')"><div class="settings-icon" style="background:rgba(255,140,0,0.1)">🔔</div><span class="settings-label">Notifications</span><div class="toggle-pill" onclick="event.stopPropagation();toggleSetting(this)"><div class="toggle-knob"></div></div></div>
+            <div class="settings-item" onclick="showMobileToast('💳 Linked Banks')"><div class="settings-icon" style="background:rgba(0,204,136,0.1)">🏦</div><span class="settings-label">Linked Banks</span><span class="settings-value">3</span><span class="settings-arrow">›</span></div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-item" onclick="showMobileToast('🔒 Security Settings')"><div class="settings-icon" style="background:rgba(255,68,102,0.1)">🔒</div><span class="settings-label">Security</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="showMobileToast('🌙 Appearance')"><div class="settings-icon" style="background:rgba(153,68,255,0.1)">🌙</div><span class="settings-label">Dark Mode</span><div class="toggle-pill" onclick="event.stopPropagation();toggleSetting(this)"><div class="toggle-knob"></div></div></div>
+            <div class="settings-item" onclick="showMobileToast('💱 Currency: USD')"><div class="settings-icon" style="background:rgba(26,111,255,0.1)">💱</div><span class="settings-label">Currency</span><span class="settings-value">USD</span><span class="settings-arrow">›</span></div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-item" onclick="showMobileToast('📤 Data exported!')"><div class="settings-icon" style="background:rgba(0,204,136,0.1)">📤</div><span class="settings-label">Export Data</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="showMobileToast('❓ Help Center')"><div class="settings-icon" style="background:rgba(255,140,0,0.1)">❓</div><span class="settings-label">Help & Support</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="showMobileToast('👋 Logging out...')"><div class="settings-icon" style="background:rgba(255,68,102,0.1)">🚪</div><span class="settings-label" style="color:var(--red)">Log Out</span><span class="settings-arrow">›</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bottom-nav">
+        <div class="nav-tab active" id="tab-home" onclick="switchScreen('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+        <div class="nav-tab" id="tab-transactions" onclick="switchScreen('transactions')"><span class="nav-icon">📋</span><span class="nav-label">History</span></div>
+        <button class="fab" onclick="openSheet('expense')" title="Add transaction">＋</button>
+        <div class="nav-tab" id="tab-budgets" onclick="switchScreen('budgets')"><span class="nav-icon">🎯</span><span class="nav-label">Budgets</span></div>
+        <div class="nav-tab" id="tab-profile" onclick="switchScreen('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></div>
+      </div>
+
+      <!-- ADD TRANSACTION SHEET -->
+      <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+      <div class="modal-sheet" id="addSheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Add Transaction</div>
+        <div class="type-tabs">
+          <div class="type-tab active expense" id="typeExpense" onclick="setType('expense')">💸 Expense</div>
+          <div class="type-tab income" id="typeIncome" onclick="setType('income')">💰 Income</div>
+        </div>
+        <div class="amount-display" id="amountDisplay">$0.00</div>
+        <div class="numpad" id="numpad"></div>
+        <div class="form-group"><div class="form-label">Description</div><input class="form-input" type="text" id="txDesc" placeholder="e.g. Coffee at Starbucks"></div>
+        <div class="form-group"><div class="form-label">Category</div><select class="form-input form-select" id="txCat"><option>🍔 Food & Dining</option><option>🚗 Transport</option><option>🛍️ Shopping</option><option>💡 Utilities</option><option>🎬 Entertainment</option><option>💊 Health</option><option>💼 Salary</option><option>💵 Freelance</option></select></div>
+        <button class="submit-btn" onclick="submitTransaction()">Add Transaction</button>
+      </div>
+
+      <!-- TOAST -->
+      <div class="mobile-toast" id="mobileToast"></div>
+    </div>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="info-panel">
+    <div class="info-card">
+      <div class="info-title">FinTrack 💙</div>
+      <div class="info-sub">A complete Flutter personal finance app with real-time tracking, budgeting, and beautiful charts. Navigate all screens using the bottom tabs.</div>
+      <div class="feature-list">
+        <div class="feature-row">Animated balance counter</div>
+        <div class="feature-row">Interactive Chart.js spending chart</div>
+        <div class="feature-row">Add expense/income via modal sheet</div>
+        <div class="feature-row">Budget tracker with progress bars</div>
+        <div class="feature-row">Cards management screen</div>
+        <div class="feature-row">Full profile & settings screen</div>
+        <div class="feature-row">Live transaction filter</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-title">Navigate Screens</div>
+      <div class="screen-btns" id="screenBtns">
+        <div class="screen-btn active" onclick="switchScreen('home')"><span class="screen-btn-icon">🏠</span>Home Dashboard</div>
+        <div class="screen-btn" onclick="switchScreen('transactions')"><span class="screen-btn-icon">📋</span>Transaction History</div>
+        <div class="screen-btn" onclick="switchScreen('cards')"><span class="screen-btn-icon">💳</span>My Cards</div>
+        <div class="screen-btn" onclick="switchScreen('budgets')"><span class="screen-btn-icon">🎯</span>Budgets</div>
+        <div class="screen-btn" onclick="switchScreen('profile')"><span class="screen-btn-icon">👤</span>Profile & Settings</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// DATA
+let balance = 12480.65;
+let txType = 'expense';
+let amountStr = '';
+let toastTimer;
+let spendChart, budgetChart;
+
+const TRANSACTIONS = [
+  {id:1,name:'Salary Deposit',cat:'💼 Salary',amount:4820,type:'income',icon:'💼',color:'rgba(0,204,136,0.15)',date:'Today'},
+  {id:2,name:'Starbucks Coffee',cat:'🍔 Food',amount:-6.50,type:'expense',icon:'☕',color:'rgba(255,140,0,0.15)',date:'Today'},
+  {id:3,name:'Uber Ride',cat:'🚗 Transport',amount:-12.40,type:'expense',icon:'🚗',color:'rgba(153,68,255,0.15)',date:'Today'},
+  {id:4,name:'Netflix Subscription',cat:'🎬 Entertainment',amount:-15.99,type:'expense',icon:'🎬',color:'rgba(255,68,102,0.15)',date:'Yesterday'},
+  {id:5,name:'Grocery Store',cat:'🛍️ Shopping',amount:-87.30,type:'expense',icon:'🛒',color:'rgba(0,102,255,0.15)',date:'Yesterday'},
+  {id:6,name:'Freelance Payment',cat:'💵 Freelance',amount:1200,type:'income',icon:'💻',color:'rgba(0,204,136,0.15)',date:'Yesterday'},
+  {id:7,name:'Electric Bill',cat:'💡 Utilities',amount:-94.00,type:'expense',icon:'💡',color:'rgba(255,140,0,0.15)',date:'Jun 3'},
+  {id:8,name:'Gym Membership',cat:'💊 Health',amount:-49.99,type:'expense',icon:'🏋️',color:'rgba(255,68,102,0.15)',date:'Jun 3'},
+  {id:9,name:'Amazon Shopping',cat:'🛍️ Shopping',amount:-134.50,type:'expense',icon:'📦',color:'rgba(26,111,255,0.15)',date:'Jun 2'},
+  {id:10,name:'Restaurant Dinner',cat:'🍔 Food',amount:-52.00,type:'expense',icon:'🍽️',color:'rgba(255,140,0,0.15)',date:'Jun 2'},
+];
+
+const BUDGETS = [
+  {name:'Food & Dining',icon:'🍔',color:'#ff8c00',bg:'rgba(255,140,0,0.1)',spent:320,total:500},
+  {name:'Transport',icon:'🚗',color:'#9944ff',bg:'rgba(153,68,255,0.1)',spent:85,total:200},
+  {name:'Shopping',icon:'🛍️',color:'#1a6fff',bg:'rgba(26,111,255,0.1)',spent:422,total:400},
+  {name:'Entertainment',icon:'🎬',color:'#ff4466',bg:'rgba(255,68,102,0.1)',spent:65,total:150},
+  {name:'Utilities',icon:'💡',color:'#00cc88',bg:'rgba(0,204,136,0.1)',spent:188,total:250},
+  {name:'Health',icon:'💊',color:'#ff8c00',bg:'rgba(255,140,0,0.1)',spent:125,total:300},
+];
+
+// INIT
+window.addEventListener('DOMContentLoaded', () => {
+  updateClock();
+  setInterval(updateClock, 1000);
+  animateBalance();
+  initSpendingChart();
+  renderTransactions();
+  renderBudgets();
+  buildNumpad();
+  setGreeting();
+});
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning 👋' : h < 18 ? 'Good afternoon 👋' : 'Good evening 👋';
+  document.getElementById('greeting').textContent = g;
+}
+
+function updateClock() {
+  const now = new Date();
+  const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  document.querySelectorAll('[id^=statusTime]').forEach(el => el.textContent = t);
+}
+
+function animateBalance() {
+  const el = document.getElementById('balanceAmount');
+  let cur = 0;
+  const step = balance / 80;
+  const timer = setInterval(() => {
+    cur += step;
+    if (cur >= balance) { cur = balance; clearInterval(timer); }
+    el.textContent = '$' + cur.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+  }, 16);
+}
+
+function initSpendingChart() {
+  const ctx = document.getElementById('spendingChart').getContext('2d');
+  const data = {labels:['Food','Transport','Shopping','Bills','Entertainment','Other'],values:[320,85,422,282,65,176]};
+  const colors = ['#ff8c00','#9944ff','#1a6fff','#00cc88','#ff4466','#4d8fff'];
+  spendChart = new Chart(ctx, {
+    type:'doughnut',
+    data:{labels:data.labels,datasets:[{data:data.values,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#0b0b1a',borderColor:'#1a1a35',borderWidth:1}}}
+  });
+  const legend = document.getElementById('spendLegend');
+  legend.innerHTML = data.labels.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${colors[i]}"></div>${l}</div>`).join('');
+}
+
+function renderTransactions(filter='all') {
+  const txs = filter === 'all' ? TRANSACTIONS : TRANSACTIONS.filter(t => t.type === filter);
+  const grouped = {};
+  txs.forEach(t => { if (!grouped[t.date]) grouped[t.date]=[]; grouped[t.date].push(t); });
+  const html = Object.entries(grouped).map(([date, items]) =>
+    `<div class="tx-date-label">${date}</div>` +
+    items.map(t => `
+      <div class="tx-item" onclick="showMobileToast('${t.icon} ${t.name}: $${Math.abs(t.amount).toFixed(2)}')">
+        <div class="tx-icon" style="background:${t.color}">${t.icon}</div>
+        <div class="tx-info"><div class="tx-name">${t.name}</div><div class="tx-cat">${t.cat}</div></div>
+        <div class="tx-amount ${t.type === 'income' ? 'credit' : 'debit'}">${t.type === 'income' ? '+' : '-'}$${Math.abs(t.amount).toFixed(2)}</div>
+      </div>
+    `).join('')
+  ).join('');
+  ['recentTx','allTx'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = html; });
+}
+
+function filterTx(type, btn) {
+  document.querySelectorAll('#screen-transactions .num-btn').forEach(b=>b.style.background='');
+  btn.style.background='rgba(26,111,255,0.15)';btn.style.borderColor='var(--blue)';btn.style.color='var(--blue2)';
+  renderTransactions(type);
+}
+
+function renderBudgets() {
+  const ctx = document.getElementById('budgetCircle').getContext('2d');
+  budgetChart = new Chart(ctx, {
+    type:'doughnut',
+    data:{datasets:[{data:[68,32],backgroundColor:['#1a6fff','#1a1a35'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  });
+  document.getElementById('budgetList').innerHTML = BUDGETS.map(b => {
+    const pct = Math.min((b.spent/b.total)*100,100);
+    const over = b.spent > b.total;
+    return `
+      <div class="budget-item">
+        <div class="budget-item-top">
+          <div class="budget-item-left">
+            <div class="budget-item-icon" style="background:${b.bg}">${b.icon}</div>
+            <div><div class="budget-item-name">${b.name}</div><div class="budget-item-sub">${over?'⚠️ Over budget':'$'+(b.total-b.spent).toFixed(0)+' left'}</div></div>
+          </div>
+          <div class="budget-amounts">
+            <div class="budget-spent" style="color:${over?'var(--red)':b.color}">$${b.spent}</div>
+            <div class="budget-total">of $${b.total}</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${over?'var(--red)':b.color}"></div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// SCREEN SWITCHING
+function switchScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.remove('hidden');
+  const tab = document.getElementById('tab-'+name);
+  if (tab) tab.classList.add('active');
+  // Update info panel btns
+  document.querySelectorAll('.screen-btn').forEach((btn,i) => {
+    const screens = ['home','transactions','cards','budgets','profile'];
+    btn.classList.toggle('active', screens[i] === name);
+  });
+}
+
+// NUMPAD
+function buildNumpad() {
+  const btns = ['1','2','3','4','5','6','7','8','9','.','0','⌫'];
+  document.getElementById('numpad').innerHTML = btns.map(b =>
+    `<button class="num-btn ${b==='⌫'?'del':''}" onclick="numInput('${b}')">${b}</button>`
+  ).join('');
+}
+
+function numInput(val) {
+  if (val === '⌫') { amountStr = amountStr.slice(0,-1); }
+  else if (val === '.' && amountStr.includes('.')) return;
+  else if (amountStr.length >= 8) return;
+  else amountStr += val;
+  const num = parseFloat(amountStr) || 0;
+  document.getElementById('amountDisplay').textContent = '$' + (amountStr === '' ? '0.00' : num.toFixed(amountStr.includes('.')?amountStr.split('.')[1].length:0));
+}
+
+function setType(type) {
+  txType = type;
+  document.getElementById('typeExpense').classList.toggle('active',type==='expense');
+  document.getElementById('typeIncome').classList.toggle('active',type==='income');
+  document.getElementById('typeExpense').classList.toggle('expense',type==='expense');
+  document.getElementById('typeIncome').classList.toggle('income',type==='income');
+}
+
+function openSheet(type) {
+  txType = type; amountStr = '';
+  setType(type);
+  document.getElementById('amountDisplay').textContent = '$0.00';
+  document.getElementById('txDesc').value = '';
+  document.getElementById('addSheet').classList.add('open');
+  document.getElementById('sheetOverlay').classList.add('open');
+}
+
+function closeSheet() {
+  document.getElementById('addSheet').classList.remove('open');
+  document.getElementById('sheetOverlay').classList.remove('open');
+}
+
+function submitTransaction() {
+  const amt = parseFloat(amountStr);
+  if (!amt || amt <= 0) { showMobileToast('⚠️ Enter a valid amount'); return; }
+  const desc = document.getElementById('txDesc').value || 'Transaction';
+  const cat = document.getElementById('txCat').value;
+  TRANSACTIONS.unshift({id:Date.now(),name:desc,cat,amount:txType==='income'?amt:-amt,type:txType,icon:cat.split(' ')[0],color:txType==='income'?'rgba(0,204,136,0.15)':'rgba(26,111,255,0.1)',date:'Today'});
+  renderTransactions();
+  closeSheet();
+  showMobileToast(`✅ ${txType==='income'?'+':'−'}$${amt.toFixed(2)} added!`);
+  amountStr = '';
+}
+
+function toggleSetting(el) { el.classList.toggle('off'); }
+
+function showMobileToast(msg) {
+  const t = document.getElementById('mobileToast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
